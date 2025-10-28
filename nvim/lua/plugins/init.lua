@@ -14,5 +14,14 @@ return {
     require("plugins.mason"),
     require("plugins.lspconfig"),
     require("plugins.luasnip"),
+    require("plugins.friendly-snippets"),
     require("plugins.nvim-cmp"),
+
+    -- Phase 3: Treesitter and Git Integration
+    require("plugins.treesitter"),
+    require("plugins.treesitter-textobjects"),
+    require("plugins.treesitter-context"),
+    require("plugins.gitsigns"),
+    require("plugins.fugitive"),
+    require("plugins.diffview"),
 }
