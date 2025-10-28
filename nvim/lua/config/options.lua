@@ -10,7 +10,7 @@ local opt = vim.opt
 
 -- Line numbers
 opt.number = true           -- Show line numbers
-opt.relativenumber = true   -- Show relative line numbers
+opt.relativenumber = false  -- Show absolute line numbers (not relative)
 opt.signcolumn = "yes"      -- Always show sign column (for git, diagnostics, etc.)
 
 -- Color and theme support

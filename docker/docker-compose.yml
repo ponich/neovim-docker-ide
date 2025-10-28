@@ -41,14 +41,15 @@ services:
 
     # Environment variables
     environment:
-      # Terminal settings
-      - TERM=xterm-256color
-      - COLORTERM=truecolor
+      # Terminal settings - inherit from host terminal
+      - TERM=${TERM:-xterm-256color}
+      - COLORTERM=${COLORTERM}
+      - TERM_PROGRAM=${TERM_PROGRAM}
 
       # Timezone
       - TZ=${TZ:-UTC}
 
-      # Optional: Pass through environment variables
+      # Locale
       - LANG=en_US.UTF-8
       - LC_ALL=en_US.UTF-8
 

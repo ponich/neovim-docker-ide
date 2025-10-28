@@ -6,3 +6,4 @@
 require("config.options")    -- Basic Vim options
 require("config.keyboard")   -- Keyboard layout settings (Russian support)
 require("config.lazy")       -- Plugin manager setup
+require("keymaps")           -- Keymaps
