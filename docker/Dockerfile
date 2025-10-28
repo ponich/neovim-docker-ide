@@ -153,10 +153,15 @@ FROM fonts-installer AS final
 # Create non-root user for better security
 ARG USER_UID=1000
 ARG USER_GID=1000
-RUN if ! getent group ${USER_GID} > /dev/null 2>&1; then \
-        groupadd -g ${USER_GID} developer; \
-    fi && \
-    useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash developer
+
+RUN set -eux; \
+    # Only create developer user if UID is not 0 (root)
+    if [ "${USER_UID}" != "0" ]; then \
+        if ! getent group ${USER_GID} > /dev/null 2>&1; then \
+            groupadd -g ${USER_GID} developer; \
+        fi && \
+        useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash developer; \
+    fi
 
 # Setup working directory
 WORKDIR /workspace
@@ -165,7 +170,8 @@ WORKDIR /workspace
 RUN mkdir -p /home/developer/.config/nvim \
     && mkdir -p /home/developer/.local/share/nvim \
     && mkdir -p /home/developer/.cache/nvim \
-    && chown -R ${USER_UID}:${USER_GID} /home/developer
+    && chown -R ${USER_UID}:${USER_GID} /home/developer \
+    && chown -R ${USER_UID}:${USER_GID} /workspace
 
 # Switch to non-root user
 USER developer

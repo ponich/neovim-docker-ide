@@ -55,8 +55,15 @@ build_image() {
     cd "$DOCKER_DIR"
 
     # Pass host user UID/GID to match permissions
-    export USER_UID=$(id -u)
-    export USER_GID=$(id -g)
+    # Use default 1000 if running as root to avoid Docker conflicts
+    USER_UID=$(id -u)
+    USER_GID=$(id -g)
+    if [ "$USER_UID" -eq 0 ]; then
+        USER_UID=1000
+        USER_GID=1000
+    fi
+    export USER_UID
+    export USER_GID
 
     docker-compose build
 
@@ -131,8 +138,15 @@ main() {
 
     # Export environment variables for docker-compose
     export WORKSPACE_PATH
-    export USER_UID=$(id -u)
-    export USER_GID=$(id -g)
+    USER_UID=$(id -u)
+    USER_GID=$(id -g)
+    # Use default 1000 if running as root to avoid Docker conflicts
+    if [ "$USER_UID" -eq 0 ]; then
+        USER_UID=1000
+        USER_GID=1000
+    fi
+    export USER_UID
+    export USER_GID
     export TZ=$(date +%Z)
 
     # Remove existing container if it's stopped
