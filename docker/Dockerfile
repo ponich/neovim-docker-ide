@@ -96,21 +96,24 @@ RUN npm install -g \
 # ============================================
 FROM nodejs-installer AS php-installer
 
-# Install PHP 8.3 and extensions
-RUN apt-get update && apt-get install -y \
-    php8.3 \
-    php8.3-cli \
-    php8.3-common \
-    php8.3-curl \
-    php8.3-mbstring \
-    php8.3-xml \
-    php8.3-zip \
-    php8.3-intl \
-    php8.3-mysql \
-    php8.3-pgsql \
-    php8.3-sqlite3 \
+# Install PHP 8.2 with extensions (8.3 not available in Ubuntu 22.04 repos)
+# Add ondrej PPA for latest PHP versions
+RUN apt-get update && apt-get install -y software-properties-common \
+    && add-apt-repository ppa:ondrej/php \
+    && apt-get update && apt-get install -y \
+    php8.2 \
+    php8.2-cli \
+    php8.2-common \
+    php8.2-curl \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-zip \
+    php8.2-intl \
+    php8.2-mysql \
+    php8.2-pgsql \
+    php8.2-sqlite3 \
     # Xdebug for debugging
-    php8.3-xdebug \
+    php8.2-xdebug \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -118,10 +121,10 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Configure Xdebug for remote debugging
-RUN echo "xdebug.mode=debug" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini
+RUN echo "xdebug.mode=debug" >> /etc/php/8.2/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /etc/php/8.2/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /etc/php/8.2/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.client_port=9003" >> /etc/php/8.2/cli/conf.d/20-xdebug.ini
 
 # ============================================
 # Stage: Install Nerd Fonts
