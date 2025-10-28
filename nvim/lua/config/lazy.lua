@@ -5,7 +5,11 @@
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system({
+    -- Ensure lazy directory exists
+    vim.fn.mkdir(vim.fn.fnamemodify(lazypath, ":h"), "p")
+
+    -- Clone lazy.nvim with error checking
+    local result = vim.fn.system({
         "git",
         "clone",
         "--filter=blob:none",
@@ -13,6 +17,11 @@ if not vim.loop.fs_stat(lazypath) then
         "--branch=stable",
         lazypath,
     })
+
+    -- Check for errors
+    if vim.v.shell_error ~= 0 then
+        vim.notify("Failed to bootstrap lazy.nvim:\n" .. result, vim.log.levels.ERROR)
+    end
 end
 vim.opt.rtp:prepend(lazypath)
 
