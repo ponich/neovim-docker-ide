@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+
+# Neovim Docker IDE Wrapper Script
+# Usage: ./bin/neovim [file or directory]
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+DOCKER_DIR="$PROJECT_ROOT/docker"
+
+# Docker image name
+IMAGE_NAME="neovim-docker-ide:latest"
+CONTAINER_NAME="neovim-ide"
+
+# ============================================
+# Helper Functions
+# ============================================
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Check if Docker is running
+check_docker() {
+    if ! docker info >/dev/null 2>&1; then
+        log_error "Docker is not running. Please start Docker and try again."
+        exit 1
+    fi
+}
+
+# Build Docker image
+build_image() {
+    log_info "Building Docker image..."
+    cd "$DOCKER_DIR"
+
+    # Pass host user UID/GID to match permissions
+    export USER_UID=$(id -u)
+    export USER_GID=$(id -g)
+
+    docker-compose build
+
+    if [ $? -eq 0 ]; then
+        log_success "Docker image built successfully"
+        cd - >/dev/null
+        return 0
+    else
+        log_error "Failed to build Docker image"
+        cd - >/dev/null
+        exit 1
+    fi
+}
+
+# Build Docker image if it doesn't exist or is invalid
+build_image_if_needed() {
+    if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+        log_info "Docker image not found. Building image..."
+        build_image
+    fi
+}
+
+# Determine workspace path
+get_workspace_path() {
+    local target_path="${1:-.}"
+
+    # Resolve to absolute path
+    if [ -d "$target_path" ]; then
+        # It's a directory
+        echo "$(cd "$target_path" && pwd)"
+    elif [ -f "$target_path" ]; then
+        # It's a file - get the directory
+        echo "$(cd "$(dirname "$target_path")" && pwd)"
+    else
+        # Doesn't exist - use current directory
+        log_warning "Path '$target_path' not found. Using current directory."
+        echo "$(pwd)"
+    fi
+}
+
+# Determine file to open in Neovim (relative to workspace)
+get_target_file() {
+    local target_path="${1:-.}"
+
+    if [ -f "$target_path" ]; then
+        # Return just the filename
+        basename "$target_path"
+    else
+        # No specific file, Neovim will open directory view
+        echo "."
+    fi
+}
+
+# ============================================
+# Main Script
+# ============================================
+
+main() {
+    log_info "Starting Neovim Docker IDE..."
+
+    # Check Docker availability
+    check_docker
+
+    # Build image if needed
+    build_image_if_needed
+
+    # Determine workspace and target
+    WORKSPACE_PATH=$(get_workspace_path "$1")
+    TARGET_FILE=$(get_target_file "$1")
+
+    log_info "Workspace: $WORKSPACE_PATH"
+
+    # Export environment variables for docker-compose
+    export WORKSPACE_PATH
+    export USER_UID=$(id -u)
+    export USER_GID=$(id -g)
+    export TZ=$(date +%Z)
+
+    # Remove existing container if it's stopped
+    if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+            log_info "Removing stopped container..."
+            docker rm "$CONTAINER_NAME" >/dev/null 2>&1
+        fi
+    fi
+
+    # Run Neovim in Docker container
+    cd "$DOCKER_DIR"
+
+    log_info "Launching Neovim..."
+
+    # Run with docker-compose, passing all arguments to Neovim
+    docker-compose run --rm \
+        -e "WORKSPACE_PATH=$WORKSPACE_PATH" \
+        -v "$WORKSPACE_PATH:/workspace:cached" \
+        neovim \
+        nvim "$TARGET_FILE" "${@:2}"
+
+    exit_code=$?
+
+    cd - >/dev/null
+
+    if [ $exit_code -eq 0 ]; then
+        log_success "Neovim session ended"
+    else
+        log_error "Neovim exited with code $exit_code"
+    fi
+
+    return $exit_code
+}
+
+# ============================================
+# Entry Point
+# ============================================
+
+# Handle special flags
+case "${1:-}" in
+    --help|-h)
+        echo "Neovim Docker IDE Wrapper"
+        echo ""
+        echo "Usage:"
+        echo "  $0 [file or directory] [neovim options]"
+        echo ""
+        echo "Examples:"
+        echo "  $0                    # Open current directory"
+        echo "  $0 .                  # Open current directory"
+        echo "  $0 /path/to/project   # Open specific directory"
+        echo "  $0 file.txt           # Open specific file"
+        echo "  $0 --version          # Show Neovim version"
+        echo ""
+        echo "Options:"
+        echo "  -h, --help            Show this help message"
+        echo "  --build               Force rebuild Docker image"
+        echo "  --version             Show Neovim version"
+        exit 0
+        ;;
+    --build)
+        log_info "Force rebuilding Docker image..."
+        cd "$DOCKER_DIR"
+        export USER_UID=$(id -u)
+        export USER_GID=$(id -g)
+        docker-compose build --no-cache
+        log_success "Image rebuilt successfully"
+        exit 0
+        ;;
+    --version)
+        check_docker
+        build_image_if_needed
+        cd "$DOCKER_DIR"
+        docker-compose run --rm neovim nvim --version
+        exit 0
+        ;;
+esac
+
+# Run main function
+main "$@"

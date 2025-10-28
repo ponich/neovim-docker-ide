@@ -1,0 +1,88 @@
+services:
+  neovim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Match host user UID/GID to avoid permission issues
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+
+    image: neovim-docker-ide:latest
+
+    # Platform is automatically detected by Docker
+    # On Apple Silicon (M1/M2/M3): linux/arm64
+    # On Intel/AMD: linux/amd64
+
+    container_name: neovim-ide
+
+    # Keep container running in interactive mode
+    stdin_open: true
+    tty: true
+
+    # Volume mounts
+    volumes:
+      # Mount Neovim configuration from host
+      - ../nvim:/home/developer/.config/nvim:cached
+
+      # Persist Neovim data (plugins, LSP servers, etc.)
+      - neovim-data:/home/developer/.local/share/nvim
+      - neovim-cache:/home/developer/.cache/nvim
+
+      # Mount workspace - this will be overridden by wrapper script
+      - ${WORKSPACE_PATH:-..}:/workspace:cached
+
+      # Share Git config (read-only)
+      - ~/.gitconfig:/home/developer/.gitconfig:ro
+      - ~/.ssh:/home/developer/.ssh:ro
+
+      # Optional: Share shell history
+      - neovim-bash-history:/home/developer/.bash_history
+
+    # Environment variables
+    environment:
+      # Terminal settings
+      - TERM=xterm-256color
+      - COLORTERM=truecolor
+
+      # Timezone
+      - TZ=${TZ:-UTC}
+
+      # Optional: Pass through environment variables
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+
+    # Network mode - allows accessing host services (like databases)
+    network_mode: host
+
+    # Working directory
+    working_dir: /workspace
+
+    # Security options
+    security_opt:
+      - seccomp:unconfined
+
+    # Disable default entrypoint for custom usage
+    entrypoint: []
+
+    # Default command - can be overridden
+    command: ["nvim"]
+
+# Named volumes for persistence
+volumes:
+  neovim-data:
+    driver: local
+    name: neovim-docker-ide-data
+
+  neovim-cache:
+    driver: local
+    name: neovim-docker-ide-cache
+
+  neovim-bash-history:
+    driver: local
+    name: neovim-docker-ide-bash-history
+
+# Networks (optional, if not using host network)
+# networks:
+#   neovim-network:
+#     driver: bridge
