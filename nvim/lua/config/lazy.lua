@@ -22,7 +22,21 @@ if not vim.loop.fs_stat(lazypath) then
     })
 
     if vim.v.shell_error ~= 0 then
-        error("Failed to bootstrap lazy.nvim:\n" .. result)
+        -- Try again with even more restricted git config
+        vim.fn.system("mkdir -p " .. lazypath)
+        local retry = vim.fn.system({
+            "git",
+            "-c", "core.configFile=/dev/null",
+            "clone",
+            "--filter=blob:none",
+            "https://github.com/folke/lazy.nvim.git",
+            "--branch=stable",
+            lazypath,
+        })
+
+        if vim.v.shell_error ~= 0 then
+            error("Failed to bootstrap lazy.nvim:\n" .. result .. "\nRetry:\n" .. retry)
+        end
     end
 end
 
