@@ -1,0 +1,167 @@
+# Neovim Docker IDE - .gitignore
+
+# ============================================
+# IDE / Editors
+# ============================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*~
+
+# ============================================
+# Neovim specific
+# ============================================
+# Plugin data (managed by lazy.nvim)
+nvim/lazy-lock.json
+nvim/plugin/
+
+# Neovim state and cache
+nvim/.netrwhist
+nvim/spell/*.spl
+nvim/spell/*.add.spl
+
+# Undo files
+nvim/undo/
+*.un~
+
+# Session files (if not managed by auto-session)
+nvim/sessions/
+Session.vim
+.session
+
+# Temporary files
+nvim/tmp/
+nvim/backup/
+nvim/swap/
+
+# LSP logs and caches
+.nvim/
+.null-ls_*
+.lsp.log
+
+# Mason (LSP manager) installed servers - optional
+# Uncomment if you want to exclude installed LSP servers from git
+# nvim/mason/
+
+# ============================================
+# Docker
+# ============================================
+# Docker volumes
+.docker/data/
+.docker/volumes/
+
+# Docker build cache
+.dockerignore.local
+
+# Docker override (user-specific)
+docker/docker-compose.override.yml
+
+# ============================================
+# System files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+.Trash-*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============================================
+# Node.js (for LSP servers and tools)
+# ============================================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# PHP (for testing projects)
+# ============================================
+vendor/
+composer.lock
+.phpunit.result.cache
+
+# ============================================
+# Environment and secrets
+# ============================================
+.env
+.env.local
+.env.*.local
+secrets/
+*.pem
+*.key
+credentials.json
+
+# ============================================
+# User-specific settings
+# ============================================
+# Allow users to have their own local configs
+nvim/lua/user/
+config.local.lua
+
+# User-specific keymaps (optional)
+# nvim/lua/keymaps/user.lua
+
+# ============================================
+# Test and coverage
+# ============================================
+coverage/
+*.cover
+.coverage
+.pytest_cache/
+.phpunit.cache/
+
+# ============================================
+# Build artifacts
+# ============================================
+dist/
+build/
+*.so
+*.dylib
+*.dll
+
+# ============================================
+# Misc
+# ============================================
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================
+# Project specific
+# ============================================
+# Screenshots and demo files (keep in docs/assets/ instead)
+# screenshots/
+
+# Local notes
+notes.md
+TODO.local.md
+
+# Experimental features
+experimental/
