@@ -168,10 +168,16 @@ WORKDIR /workspace
 
 # Create directories for Neovim data
 RUN mkdir -p /home/developer/.config/nvim \
-    && mkdir -p /home/developer/.local/share/nvim \
+    && mkdir -p /home/developer/.local/share/nvim/lazy \
     && mkdir -p /home/developer/.cache/nvim \
     && chown -R ${USER_UID}:${USER_GID} /home/developer \
     && chown -R ${USER_UID}:${USER_GID} /workspace
+
+# Pre-install lazy.nvim to avoid bootstrap issues in Docker
+RUN cd /tmp \
+    && git clone --filter=blob:none --branch=stable \
+    https://github.com/folke/lazy.nvim.git /home/developer/.local/share/nvim/lazy/lazy.nvim \
+    && chown -R ${USER_UID}:${USER_GID} /home/developer/.local/share/nvim/lazy
 
 # Switch to non-root user
 USER developer

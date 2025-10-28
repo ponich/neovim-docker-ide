@@ -4,11 +4,14 @@
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+
+-- Ensure lazy.nvim is available (pre-installed in Docker, or fallback to clone)
 if not vim.loop.fs_stat(lazypath) then
     -- Ensure lazy directory exists
-    vim.fn.mkdir(vim.fn.fnamemodify(lazypath, ":h"), "p")
+    local lazydir = vim.fn.fnamemodify(lazypath, ":h")
+    vim.fn.mkdir(lazydir, "p")
 
-    -- Clone lazy.nvim with error checking
+    -- Clone lazy.nvim as fallback for non-Docker environments
     local result = vim.fn.system({
         "git",
         "clone",
@@ -18,11 +21,12 @@ if not vim.loop.fs_stat(lazypath) then
         lazypath,
     })
 
-    -- Check for errors
     if vim.v.shell_error ~= 0 then
-        vim.notify("Failed to bootstrap lazy.nvim:\n" .. result, vim.log.levels.ERROR)
+        error("Failed to bootstrap lazy.nvim:\n" .. result)
     end
 end
+
+-- Add lazy.nvim to runtime path
 vim.opt.rtp:prepend(lazypath)
 
 -- Setup lazy.nvim
