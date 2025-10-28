@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y \
     # Search tools (required for Telescope)
     ripgrep \
     fd-find \
+    # Clipboard support (for copy/paste in Docker)
+    xclip \
     # Additional utilities
     jq \
     tree \
@@ -94,21 +96,21 @@ RUN npm install -g \
 # ============================================
 FROM nodejs-installer AS php-installer
 
-# Install PHP 8.2 and extensions
+# Install PHP 8.3 and extensions
 RUN apt-get update && apt-get install -y \
-    php8.1 \
-    php8.1-cli \
-    php8.1-common \
-    php8.1-curl \
-    php8.1-mbstring \
-    php8.1-xml \
-    php8.1-zip \
-    php8.1-intl \
-    php8.1-mysql \
-    php8.1-pgsql \
-    php8.1-sqlite3 \
+    php8.3 \
+    php8.3-cli \
+    php8.3-common \
+    php8.3-curl \
+    php8.3-mbstring \
+    php8.3-xml \
+    php8.3-zip \
+    php8.3-intl \
+    php8.3-mysql \
+    php8.3-pgsql \
+    php8.3-sqlite3 \
     # Xdebug for debugging
-    php8.1-xdebug \
+    php8.3-xdebug \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -116,10 +118,10 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Configure Xdebug for remote debugging
-RUN echo "xdebug.mode=debug" >> /etc/php/8.1/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /etc/php/8.1/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /etc/php/8.1/cli/conf.d/20-xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /etc/php/8.1/cli/conf.d/20-xdebug.ini
+RUN echo "xdebug.mode=debug" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.start_with_request=yes" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini \
+    && echo "xdebug.client_port=9003" >> /etc/php/8.3/cli/conf.d/20-xdebug.ini
 
 # ============================================
 # Stage: Install Nerd Fonts

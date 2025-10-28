@@ -2,9 +2,17 @@
 -- Plugins List
 -- ============================================
 
--- For now, return an empty table
--- Plugins will be added here as we progress through the roadmap
-
 return {
-    -- Plugins will be added here
+    -- Core plugins from Phase 1
+    require("plugins.colorscheme"),
+    require("plugins.lualine"),
+    require("plugins.bufferline"),
+    require("plugins.nvim-tree"),
+    require("plugins.telescope"),
+
+    -- Phase 2: LSP and Language Servers
+    require("plugins.mason"),
+    require("plugins.lspconfig"),
+    require("plugins.luasnip"),
+    require("plugins.nvim-cmp"),
 }

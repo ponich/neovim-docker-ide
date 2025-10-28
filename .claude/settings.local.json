@@ -4,7 +4,12 @@
       "Bash(tree:*)",
       "Bash(git commit:*)",
       "Bash(echo:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker kill:*)",
+      "Bash(./bin/neovim:*)",
+      "Bash(timeout 30 ./bin/neovim:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

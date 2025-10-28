@@ -69,7 +69,7 @@ keymap("v", ">", ">gv", opts)
 
 -- Move text up and down
 keymap("v", "J", ":m '>+1<cr>gv=gv", opts)
-keymap("v", "K", ":m '<-2<cr>gv=gv", opts)
+keymap("v", "<A-k>", ":m '<-2<cr>gv=gv", opts)
 
 -- Keep cursor centered when scrolling
 keymap("n", "<C-d>", "<C-d>zz", opts)
@@ -87,9 +87,10 @@ keymap({ "n", "v" }, "<leader>d", '"_d', vim.tbl_extend("force", opts, { desc = 
 -- Clipboard
 -- ============================================
 
--- Copy to system clipboard
-keymap({ "n", "v" }, "<leader>y", '"+y', vim.tbl_extend("force", opts, { desc = "Copy to system clipboard" }))
-keymap("n", "<leader>Y", '"+Y', vim.tbl_extend("force", opts, { desc = "Copy line to system clipboard" }))
+-- Standard Vim copy/paste with system clipboard
+-- y = copy to clipboard (with clipboard=unnamedplus)
+-- p = paste from clipboard
+-- These work normally like in any Vim installation
 
 -- ============================================
 -- Command Mode

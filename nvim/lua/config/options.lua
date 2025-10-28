@@ -81,8 +81,8 @@ opt.encoding = "utf-8"      -- Internal encoding
 -- Mouse
 opt.mouse = "a"             -- Enable mouse in all modes
 
--- Clipboard
-opt.clipboard = "unnamedplus" -- Use system clipboard
+-- Clipboard - configured in config/clipboard.lua
+-- Supports both local and system clipboard operations
 
 -- Completion
 opt.completeopt = { "menu", "menuone", "noselect" } -- Completion options

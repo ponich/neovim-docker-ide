@@ -1,0 +1,5 @@
+-- ============================================
+-- LSP Module Initialization
+-- ============================================
+-- This file is kept for potential future LSP-level configurations
+-- Current setup is handled by plugins/lspconfig.lua and plugins/mason-lspconfig.lua
